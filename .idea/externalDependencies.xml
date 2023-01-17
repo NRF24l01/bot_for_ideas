@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ExternalDependencies">
+    <plugin id="com.intellij.database" />
+    <plugin id="com.jetbrains.gerryPurpleTheme" />
+    <plugin id="izhangzhihao.rainbow.brackets" />
+  </component>
+</project>
