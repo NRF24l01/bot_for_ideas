@@ -3,21 +3,57 @@ import config
 import sqlite3
 import random
 from datetime import datetime
-import token
+import ttoken
 
-bot = telebot.TeleBot(token.token)
+bot = telebot.TeleBot(ttoken.token)
+
+@bot.message_handler(commands=["del"])
+def complite(message):
+    log(message)
+    current_datetime = str(datetime.now())
+    resultee = current_datetime + " " + message.from_user.username + "  Use command: "+message.text
+    print(resultee)
+    if is_admin(message):
+        us = extract_arg(message.text)
+        deli(message, us[0])
+        bot.send_message(message.chat.id, "Сделано.")
+    else:
+        bot.send_message(message.chat.id, "Вам не достаточно прав.")
+
+@bot.message_handler(commands=["complete"])
+def complite(message):
+    log(message)
+    current_datetime = str(datetime.now())
+    resultee = current_datetime + " " + message.from_user.username + "  Use command: "+message.text
+    print(resultee)
+    if is_admin(message):
+        us = extract_arg(message.text)
+        comp(message, us[0])
+        bot.send_message(message.chat.id, "Сделано.")
+    else:
+        bot.send_message(message.chat.id, "Вам не достаточно прав.")
+
 @bot.message_handler(commands=["help"])
 def help(message):
     bot.send_message(message.chat.id, config.help_txt)
+    log(message)
+    current_datetime = str(datetime.now())
+    resultee = current_datetime + " " + message.from_user.username + "  Use command: "+message.text
+    print(resultee)
 
 @bot.message_handler(commands=["ban"])
-def yourCommand(message):
+def ban(message):
     if is_admin(message):
         us = extract_arg(message.text)
         bun(message, us[0])
         bot.send_message(message.chat.id, "Сделано.")
     else:
         bot.send_message(message.chat.id, "Вам не достаточно прав.")
+    log(message)
+    current_datetime = str(datetime.now())
+    resultee = current_datetime + " " + message.from_user.username + "  Use command: "+message.text
+    print(resultee)
+
 
 @bot.message_handler(commands=["op"])
 def opi(message):
@@ -27,6 +63,10 @@ def opi(message):
         bot.send_message(message.chat.id, "Сделано.")
     else:
         bot.send_message(message.chat.id, "Вам не достаточно прав.")
+    log(message)
+    current_datetime = str(datetime.now())
+    resultee = current_datetime + " " + message.from_user.username + "  Use command: "+message.text
+    print(resultee)
 
 @bot.message_handler(commands=["deop"])
 def opi(message):
@@ -36,6 +76,10 @@ def opi(message):
         bot.send_message(message.chat.id, "Сделано.")
     else:
         bot.send_message(message.chat.id, "Вам не достаточно прав.")
+    log(message)
+    current_datetime = str(datetime.now())
+    resultee = current_datetime + " " + message.from_user.username + "  Use command: "+message.text
+    print(resultee)
 
 @bot.message_handler(commands=["deban"])
 def deopi(message):
@@ -45,13 +89,17 @@ def deopi(message):
         bot.send_message(message.chat.id, "Сделано.")
     else:
         bot.send_message(message.chat.id, "Вам не достаточно прав.")
+    log(message)
+    current_datetime = str(datetime.now())
+    resultee = current_datetime + " " + message.from_user.username + "  Use command: "+message.text
+    print(resultee)
 
 @bot.message_handler(commands=["start"])
 def start(m, res=False):
     # ran_num = randint(0, 4)
     # stiker=config.stikers[ran_num]
     bot.send_sticker(m.chat.id, random.choice(config.stikers))
-    bot.send_message(m.chat.id, 'Привет)) Я бот который помогает Самоуправлению' + config.versions)
+    bot.send_message(m.chat.id, 'Привет)) Я бот который помогает Самоуправлению ' + config.versions)
     bot.send_message(m.chat.id, '👇')
 
     # menu = [{'text': '🆕Предложить идею🆕', 'callback_data': 'new'}, {'text': '👁️Посмотреть идеи👁️', 'callback_data': 'watsh'}, ["📛Правила📛", "🫵Профиль🫵"], ["☢️Разраб☢️", "🙋‍♂️Попасть в актив🙋‍♂️"]]
@@ -129,7 +177,7 @@ def new(message):
 
 def watch(message):
     try:
-        conn = sqlite3.connect("data.db")
+        conn = sqlite3.connect(config.db_name)
         cursor = conn.cursor()
 
         # cursor.execute("INSERT INTO 'users' (user_id) VALUES ('1000')")
@@ -143,7 +191,6 @@ def watch(message):
         for item in user_t:
             st = st + str(item)
             # st = int(st)
-        bot.send_message(message.chat.id, 'Количество идей: ' + st)
         # bot.send_message(message.chat.id, 'Остальное дописывается')
 
         conn.commit()
@@ -161,7 +208,7 @@ def watch(message):
 
     for i in range(1, st + 1):
         try:
-            conn = sqlite3.connect("data.db")
+            conn = sqlite3.connect(config.db_name)
             cursor = conn.cursor()
 
             # cursor.execute("INSERT INTO 'users' (user_id) VALUES ('1000')")
@@ -208,7 +255,7 @@ def aktive(message):
 def new_idea(message):
     if str(message.text.lower()) != "нет":
         try:
-            conn = sqlite3.connect("data.db")
+            conn = sqlite3.connect(config.db_name)
             cursor = conn.cursor()
 
             current_datetime = datetime.now()
@@ -238,10 +285,10 @@ def new_idea(message):
     # log(message, "Предложил:")
 
 
-def log(message, tylo):
+def log(message, tylo = ""):
     if tylo == "Отправил стикер: ":
         try:
-            conn = sqlite3.connect("data.db")
+            conn = sqlite3.connect(config.db_name)
             cursor = conn.cursor()
 
             current_datetime = datetime.now()
@@ -259,7 +306,7 @@ def log(message, tylo):
                 conn.close()
     elif tylo == "New":
         try:
-            conn = sqlite3.connect("data.db")
+            conn = sqlite3.connect(config.db_name)
             cursor = conn.cursor()
 
             current_datetime = datetime.now()
@@ -277,7 +324,7 @@ def log(message, tylo):
                 conn.close()
     else:
         try:
-            conn = sqlite3.connect("data.db")
+            conn = sqlite3.connect(config.db_name)
             cursor = conn.cursor()
 
             current_datetime = datetime.now()
@@ -296,7 +343,7 @@ def log(message, tylo):
 
 def new_used(message):
     try:
-        conn = sqlite3.connect("data.db")
+        conn = sqlite3.connect(config.db_name)
         cursor = conn.cursor()
 
         current_datetime = datetime.now()
@@ -320,7 +367,7 @@ def new_used(message):
 def new_y(message):
     count_m = []
     try:
-        conn = sqlite3.connect("data.db")
+        conn = sqlite3.connect(config.db_name)
         cursor = conn.cursor()
 
         # cursor.execute("INSERT INTO 'users' (user_id) VALUES ('1000')")
@@ -344,7 +391,7 @@ def updstate(message, st):
     global state, state_s
     if st == None:
         try:
-            conn = sqlite3.connect("data.db")
+            conn = sqlite3.connect(config.db_name)
             cursor = conn.cursor()
 
             # cursor.execute("INSERT INTO 'users' (user_id) VALUES ('1000')")
@@ -368,7 +415,7 @@ def updstate(message, st):
         return state_s
     elif st == True:
         try:
-            conn = sqlite3.connect("data.db")
+            conn = sqlite3.connect(config.db_name)
             cursor = conn.cursor()
 
             # cursor.execute("INSERT INTO 'users' (user_id) VALUES ('1000')")
@@ -389,7 +436,7 @@ def updstate(message, st):
                 conn.close()
     elif st == False:
         try:
-            conn = sqlite3.connect("data.db")
+            conn = sqlite3.connect(config.db_name)
             cursor = conn.cursor()
 
             # cursor.execute("INSERT INTO 'users' (user_id) VALUES ('1000')")
@@ -407,7 +454,7 @@ def updstate(message, st):
 
 def prof(message):
     try:
-        conn = sqlite3.connect("data.db")
+        conn = sqlite3.connect(config.db_name)
         cursor = conn.cursor()
 
         # cursor.execute("INSERT INTO 'users' (user_id) VALUES ('1000')")
@@ -419,7 +466,6 @@ def prof(message):
         # print(user_m, i)
         # print(user_m, user_m[0])
         user_t = user_m[0]
-        print(user_t, user_t[0])
         st = ""
         conn.commit()
 
@@ -438,7 +484,7 @@ def prof(message):
     txt = "Ваш id: " + us_id + """
 """ + "📨Предложено идей Вами: " + gen_idea + """
 """ + "🚫Нарушений: " + non_r + """
-""" + "✅Сделано из преложеных вами идей: " + comp_id + """
+""" + "✅Сделано из преложеных Вами идей(твоих): " + comp_id + """
 """ + "🙎‍♂️Ваш ранг: " + state
 
     bot.send_message(message.chat.id, txt)
@@ -446,7 +492,7 @@ def prof(message):
 
 def genPlus(message):
     try:
-        conn = sqlite3.connect("data.db")
+        conn = sqlite3.connect(config.db_name)
         cursor = conn.cursor()
 
         # cursor.execute("INSERT INTO 'users' (user_id) VALUES ('1000')")
@@ -477,7 +523,7 @@ def genPlus(message):
 
 def is_user(message):
     try:
-        conn = sqlite3.connect("data.db")
+        conn = sqlite3.connect(config.db_name)
         cursor = conn.cursor()
 
         # cursor.execute("INSERT INTO 'users' (user_id) VALUES ('1000')")
@@ -500,7 +546,7 @@ def is_user(message):
 
 def bun(message, bunned):
     try:
-        conn = sqlite3.connect("data.db")
+        conn = sqlite3.connect(config.db_name)
         cursor = conn.cursor()
 
         cursor.execute("UPDATE profiles SET status = 'BAN'  WHERE user_id == '" + str(bunned) + "'")
@@ -517,7 +563,7 @@ def bun(message, bunned):
 
 def debun(message, bunned):
     try:
-        conn = sqlite3.connect("data.db")
+        conn = sqlite3.connect(config.db_name)
         cursor = conn.cursor()
 
         cursor.execute("UPDATE profiles SET status = 'USER'  WHERE user_id == '" + str(bunned) + "'")
@@ -534,13 +580,12 @@ def debun(message, bunned):
 
 def is_admin(message):
     try:
-        conn = sqlite3.connect("data.db")
+        conn = sqlite3.connect(config.db_name)
         cursor = conn.cursor()
 
         txt = cursor.execute("SELECT status FROM profiles WHERE us_id == " + str(message.from_user.id) + " ").fetchall()
 
         txt = str(txt[0][0])
-        print(txt)
         conn.commit()
 
     except sqlite3.Error as error:
@@ -556,13 +601,12 @@ def is_admin(message):
 
 def is_technik(message):
     try:
-        conn = sqlite3.connect("data.db")
+        conn = sqlite3.connect(config.db_name)
         cursor = conn.cursor()
 
         txt = cursor.execute("SELECT status FROM profiles WHERE us_id == " + str(message.from_user.id) + " ").fetchall()
 
         txt = str(txt[0][0])
-        print(txt)
         conn.commit()
 
     except sqlite3.Error as error:
@@ -578,7 +622,7 @@ def is_technik(message):
 
 def op(message, who):
     try:
-        conn = sqlite3.connect("data.db")
+        conn = sqlite3.connect(config.db_name)
         cursor = conn.cursor()
 
         txt = cursor.execute("UPDATE profiles SET status = 'MOD'  WHERE user_id == '" + str(who) + "'")
@@ -595,7 +639,7 @@ def op(message, who):
 
 def deop(message, who):
     try:
-        conn = sqlite3.connect("data.db")
+        conn = sqlite3.connect(config.db_name)
         cursor = conn.cursor()
 
         txt = cursor.execute("UPDATE profiles SET status = 'USER'  WHERE user_id == '" + str(who) + "'")
@@ -610,5 +654,81 @@ def deop(message, who):
             conn.close()
     log(message, 'Разжаловал'+str(who))
 
+def comp(message, id_of_idea):
+    try:
+        conn = sqlite3.connect(config.db_name)
+        cursor = conn.cursor()
+
+        cursor.execute("UPDATE users SET idea = 'Нет'  WHERE id == '" + str(id_of_idea) + "'")
+
+        conn.commit()
+
+    except sqlite3.Error as error:
+        print("Error26: ", error)
+
+    finally:
+        if (conn):
+            conn.close()
+
+    try:
+        conn = sqlite3.connect(config.db_name)
+        cursor = conn.cursor()
+
+        id = cursor.execute("SELECT us_id FROM users WHERE id == " + str(id_of_idea) + " ").fetchall()[0][0]
+
+        conn.commit()
+
+    except sqlite3.Error as error:
+        print("Error23: ", error)
+
+    finally:
+        if (conn):
+            conn.close()
+
+    try:
+        conn = sqlite3.connect(config.db_name)
+        cursor = conn.cursor()
+
+        new_count = cursor.execute(f"SELECT compleat_ideas FROM profiles WHERE us_id == '{id}'").fetchall()[0][0]
+
+        conn.commit()
+
+    except sqlite3.Error as error:
+        print("Error23: ", error)
+
+    finally:
+        if (conn):
+            conn.close()
+
+    try:
+        conn = sqlite3.connect(config.db_name)
+        cursor = conn.cursor()
+
+        cursor.execute(f"UPDATE profiles SET compleat_ideas = '{new_count}'  WHERE us_id == '{str(id)}'")
+
+        conn.commit()
+
+    except sqlite3.Error as error:
+        print("Error26: ", error)
+
+    finally:
+        if (conn):
+            conn.close()
+
+def deli(message, id):
+    try:
+        conn = sqlite3.connect(config.db_name)
+        cursor = conn.cursor()
+
+        cursor.execute("UPDATE users SET idea = 'Нет'  WHERE id == '" + str(id) + "'")
+
+        conn.commit()
+
+    except sqlite3.Error as error:
+        print("Error26: ", error)
+
+    finally:
+        if (conn):
+            conn.close()
 # Запускаем бота
 bot.polling(none_stop=True)

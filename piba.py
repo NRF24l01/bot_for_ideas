@@ -1,7 +1,7 @@
 import sqlite3
 
 try:
-    conn = sqlite3.connect("data.db")
+    conn = sqlite3.connect("dataNone.db")
     cursor = conn.cursor()
 
     txt = cursor.execute("SELECT user_id FROM profiles WHERE user_id='102423' ")
