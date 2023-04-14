@@ -9,6 +9,6 @@
 3)Create string what named "token" and add to it your token
 
 3.5)Look like that:
-`token=''`
+`token='token'`
 
 4)Run and fun)
