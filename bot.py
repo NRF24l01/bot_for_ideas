@@ -8,6 +8,10 @@ import ttoken
 bot = telebot.TeleBot(ttoken.token)
 
 @bot.message_handler(commands=["del"])
+def like(message):
+    pass
+
+@bot.message_handler(commands=["del"])
 def complite(message):
     log(message)
     current_datetime = str(datetime.now())
@@ -165,9 +169,6 @@ def handle_text(message):
 def extract_arg(arg):
     return arg.split()[1:]
 
-
-
-
 def new(message):
     bot.send_message(message.chat.id, '🖊Отправте идею🖊. "Нет" если не хотите оправлять.')
     global state
@@ -212,18 +213,14 @@ def watch(message):
             cursor = conn.cursor()
 
             # cursor.execute("INSERT INTO 'users' (user_id) VALUES ('1000')")
-            user = cursor.execute("SELECT idea FROM users WHERE id == " + str(i) + "")
-            # print(type(count))
-            user_m = user.fetchall()
-            # print(user_m, i)
-            # print(user_m, user_m[0])
-            user_t = user_m[0]
-            st = ""
-            for item in user_t:
-                st = st + str(item)
-                # st = int(st)
-            if st.lower() != "нет":
-                bot.send_message(message.chat.id, "Идея №" + str(i) + ": " + st)
+            idea = cursor.execute("SELECT idea FROM users WHERE id == " + str(i) + "").fetchall()[0][0]
+            us_id = cursor.execute("SELECT us_id FROM users WHERE id == " + str(i) + "").fetchall()[0][0]
+            user_id = cursor.execute("SELECT user_id FROM users WHERE id == " + str(i) + "").fetchall()[0][0]
+            if idea.lower() != "нет":
+                txt = f"""№ {str(i)}
+Автор идеи: {us_id}/{user_id}
+Текст идеи: {idea}"""
+                bot.send_message(message.chat.id, txt)
             # bot.send_message(message.chat.id, 'Остальное дописывается')
 
             conn.commit()
@@ -730,5 +727,8 @@ def deli(message, id):
     finally:
         if (conn):
             conn.close()
+
+def how_many_likes(message, idea_id):
+    pass
 # Запускаем бота
 bot.polling(none_stop=True)
