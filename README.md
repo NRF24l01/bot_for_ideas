@@ -1,8 +1,6 @@
 # **_HOW TO INSTALL_**
 
-0)You need make vnc
-
-1)After you go to [BotFather](https://t.me/BotFather) and get token
+1)go to [BotFather](https://t.me/BotFather) and get token
 
 2)Create python file "Token.py"
 
