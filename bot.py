@@ -7,9 +7,18 @@ import ttoken
 
 bot = telebot.TeleBot(ttoken.token)
 
-@bot.message_handler(commands=["del"])
+@bot.message_handler(commands=["like"])
 def like(message):
-    pass
+    log(message)
+    current_datetime = str(datetime.now())
+    resultee = current_datetime + " " + message.from_user.username + "  Use command: "+message.text
+    print(resultee)
+    us = extract_arg(message.text)
+    if add_like(message, us[0]):
+        bot.send_message(message.chat.id, "Успешно!")
+    else:
+        bot.send_message(message.chat.id, "Вероятно вы уже лайкнули эту идею( Либо эта идея была удалена.")
+
 
 @bot.message_handler(commands=["del"])
 def complite(message):
@@ -171,7 +180,6 @@ def extract_arg(arg):
 
 def new(message):
     bot.send_message(message.chat.id, '🖊Отправте идею🖊. "Нет" если не хотите оправлять.')
-    global state
     updstate(message, True)
     # print(state)
 
@@ -217,9 +225,11 @@ def watch(message):
             us_id = cursor.execute("SELECT us_id FROM users WHERE id == " + str(i) + "").fetchall()[0][0]
             user_id = cursor.execute("SELECT user_id FROM users WHERE id == " + str(i) + "").fetchall()[0][0]
             if idea.lower() != "нет":
-                txt = f"""№ {str(i)}
-Автор идеи: {us_id}/{user_id}
-Текст идеи: {idea}"""
+                likes = str(how_many_likes(message, i))
+                txt = f"""#️⃣  №{str(i)}
+🧑‍Автор идеи: {us_id}/{user_id}
+👍Лайков: {likes}
+ - {idea}"""
                 bot.send_message(message.chat.id, txt)
             # bot.send_message(message.chat.id, 'Остальное дописывается')
 
@@ -257,8 +267,8 @@ def new_idea(message):
 
             current_datetime = datetime.now()
             cursor.execute(
-                "INSERT INTO 'users' (user_id, idea, us_id) VALUES ('" + str(message.from_user.username) + "', '" + str(
-                    message.text) + "', '" + str(message.from_user.id) + "')")
+                "INSERT INTO 'users' (user_id, idea, us_id, likes) VALUES ('" + str(message.from_user.username) + "', '" + str(
+                    message.text) + "', '" + str(message.from_user.id) + "','zero')")
             resultee = str(
                 current_datetime) + " " + message.from_user.username + " Предложил новую идею: '" + message.text + "'"
             print(resultee)
@@ -385,7 +395,6 @@ def new_y(message):
 
 
 def updstate(message, st):
-    global state, state_s
     if st == None:
         try:
             conn = sqlite3.connect(config.db_name)
@@ -729,6 +738,100 @@ def deli(message, id):
             conn.close()
 
 def how_many_likes(message, idea_id):
-    pass
+    try:
+        conn = sqlite3.connect(config.db_name)
+        cursor = conn.cursor()
+
+        mass_likes = cursor.execute(f"SELECT likes FROM users WHERE id == '{idea_id}'").fetchall()[0][0]
+
+        conn.commit()
+
+    except sqlite3.Error as error:
+        print("Error23: ", error)
+
+    finally:
+        if (conn):
+            conn.close()
+    if mass_likes == "0" or mass_likes == "zero":
+        return 0
+    else:
+        len_with_likes = mass_likes.split('|')
+        res = len(len_with_likes) - 1
+        return res
+
+def add_like(message, idea_id):
+    try:
+        conn = sqlite3.connect(config.db_name)
+        cursor = conn.cursor()
+
+        mass_likes = cursor.execute(f"SELECT likes FROM users WHERE id == '{idea_id}'").fetchall()[0][0]
+        idea = cursor.execute(f"SELECT idea FROM users WHERE id == {idea_id}").fetchall()[0][0]
+
+        conn.commit()
+
+    except sqlite3.Error as error:
+        print("Error203: ", error)
+
+    finally:
+        if (conn):
+            conn.close()
+    if idea.lower() == "нет":
+       return False
+    if mass_likes == "0" or mass_likes == "zero" :
+        try:
+            conn = sqlite3.connect(config.db_name)
+            cursor = conn.cursor()
+
+            txt = cursor.execute(f"UPDATE users SET likes = '{message.from_user.id}|'  WHERE id == '{idea_id}' ")
+
+            conn.commit()
+
+        except sqlite3.Error as error:
+            print("Error26: ", error)
+
+        finally:
+            if (conn):
+                conn.close()
+        return True
+    else:
+        len_who_like = mass_likes.split('|')
+        len_who_like.pop()
+        if str(message.from_user.id) in len_who_like:
+            return False
+        else:
+            try:
+                conn = sqlite3.connect(config.db_name)
+                cursor = conn.cursor()
+
+                who_like = cursor.execute(f"SELECT likes FROM users WHERE id == {idea_id}").fetchall()[0][0]
+
+
+                conn.commit()
+
+            except sqlite3.Error as error:
+                print("Error26: ", error)
+
+            finally:
+                if (conn):
+                    conn.close()
+            print(idea)
+
+            new_who_like = who_like + str(message.from_user.id)+"|"
+            try:
+                conn = sqlite3.connect(config.db_name)
+                cursor = conn.cursor()
+
+                txt = cursor.execute(f"UPDATE users SET likes = '{new_who_like}'  WHERE id == '{idea_id}' ")
+
+                conn.commit()
+
+            except sqlite3.Error as error:
+                print("Error26: ", error)
+
+            finally:
+                if (conn):
+                    conn.close()
+            return True
+
 # Запускаем бота
 bot.polling(none_stop=True)
