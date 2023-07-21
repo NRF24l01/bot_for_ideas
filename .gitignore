@@ -1,2 +1,5 @@
 ttoken.py
 /bot_data
+venv
+.idea
+config.py
