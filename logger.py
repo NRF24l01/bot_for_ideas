@@ -11,8 +11,8 @@ class Logger:
         self.logger = logging.getLogger("my_logger")
         self.logger.setLevel(logging.DEBUG)
 
-        self.console_handler = logging.StreamHandler(stream=sys.stdout)  # Устанавливаем поток sys.stdout для поддержки UTF-8
-        self.console_formatter = logging.Formatter(Fore.RED + '%(levelname)s - %(message)s' + Fore.RESET)  # Используем colorama для красного цвета
+        self.console_handler = logging.StreamHandler()
+        self.console_formatter = logging.Formatter('%(levelname)s - %(message)s')  # Используем colorama для красного цвета
         self.console_handler.setFormatter(self.console_formatter)
         self.logger.addHandler(self.console_handler)
 
