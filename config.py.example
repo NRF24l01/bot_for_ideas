@@ -1,1 +1,5 @@
 tele_token=""
+
+keyboard_actions = [{"text": "🆕Предложить идею🆕", "callback_data": "new"},
+                    {"text": "👁️Посмотреть идеи👁️", "callback_data": "watch"},
+                    {"text": "🤜Профиль🤛", "callback_data": "your"}]
