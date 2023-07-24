@@ -1,9 +1,6 @@
 import logging
 import sys
-from colorama import init, Fore
 
-# Инициализация colorama
-init()
 
 class Logger:
     def __init__(self, filename):

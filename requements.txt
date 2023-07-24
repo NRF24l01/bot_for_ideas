@@ -1,3 +1,4 @@
 pyTelegramBotAPI
 keyboa
 colorama
+psycopg2-binary
