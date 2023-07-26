@@ -13,6 +13,7 @@ admin_txt="""❗️❗️Команды для админов❗️❗️
 
 help_txt="""❗️❗️Команды❗️❗️"""
 
-postegress_name=""
-postegress_host=""
-postegress_pass=""
+postegress_host="192.168.0.1"
+
+postegress_name="pop"
+postegress_pass="masha"
